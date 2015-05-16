@@ -15,7 +15,6 @@ namespace TurboCommand.Package
             this.shellService = shellService;
             this.callback = callback;
 
-            // Set an event handler to detect when the IDE is fully initialized
             int hr = this.shellService.AdviseShellPropertyChanges(this, out this.cookie);
 
             ErrorHandler.ThrowOnFailure(hr);
@@ -32,7 +31,6 @@ namespace TurboCommand.Package
 
                 if (!isZombie)
                 {
-                    // Release the event handler to detect when the IDE is fully initialized
                     hr = this.shellService.UnadviseShellPropertyChanges(this.cookie);
 
                     ErrorHandler.ThrowOnFailure(hr);

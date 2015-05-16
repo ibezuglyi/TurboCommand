@@ -1,12 +1,4 @@
-﻿/***************************************************************************
-
-Copyright (c) Microsoft Corporation. All rights reserved.
-THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
-ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
-IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
-PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
-
-***************************************************************************/
+﻿
 
 using EnvDTE80;
 using Microsoft.VisualStudio;
@@ -71,7 +63,7 @@ namespace TurboCommand.Package
 
             this.dte = this.GetService(typeof(SDTE)) as DTE2;
 
-            if (this.dte == null) // The IDE is not yet fully initialized
+            if (this.dte == null) 
             {
                 shellService = this.GetService(typeof(SVsShell)) as IVsShell;
                 this._dteInitializer = new DteInitializer(shellService, this.InitializeDTE);

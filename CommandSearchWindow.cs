@@ -14,9 +14,7 @@ namespace TurboCommand.Package
         private DTE2 dte;
         private DteInitializer dteInitializer;
 
-        /// <summary>
-        /// Standard constructor for the tool window.
-        /// </summary>
+        
         public CommandSearchWindow() :
             base(null)
         {
