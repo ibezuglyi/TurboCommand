@@ -1,5 +1,6 @@
 ﻿
 
+using Akka.Actor;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
@@ -24,9 +25,10 @@ namespace TurboCommand.Package
     {
         private DteInitializer _dteInitializer;
         private DTE2 dte;
-
+        private ActorSystem commandSystem;
         public MenuCommandsPackage()
         {
+            commandSystem = ActorSystem.Create("CommandSystem");
         }
 
         protected override void Initialize()
@@ -54,7 +56,7 @@ namespace TurboCommand.Package
             
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            mytoolwindow.initDte(this.dte);
+            mytoolwindow.InitActorSystem(commandSystem, dte);
         }
 
         private void InitializeDTE()

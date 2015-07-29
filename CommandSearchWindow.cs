@@ -1,4 +1,5 @@
-﻿using EnvDTE;
+﻿using Akka.Actor;
+using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -13,20 +14,21 @@ namespace TurboCommand.Package
     {
         private DTE2 dte;
         private DteInitializer dteInitializer;
+        public ActorSystem CommandSystem { get; set; }
+        public CommandSearchControl SearchControl { get; set; }
 
-        
         public CommandSearchWindow() :
             base(null)
         {
             this.Caption = "Search for command";
-            
             this.BitmapResourceID = 301;
             this.BitmapIndex = 1;
-            var control = new CommandSearchControl();
-            base.Content = control;
-            control.ReadyToBeClosed += CloseWindow;
-            control.OnRaiseCommand += RaiseCommand;
+            SearchControl = new CommandSearchControl();
+            base.Content = SearchControl;
+            SearchControl.ReadyToBeClosed += CloseWindow;
+            SearchControl.OnRaiseCommand += RaiseCommand;
         }
+
 
         private void RaiseCommand(object sender, OnCommandEventArgs eventArgs)
         {
@@ -46,12 +48,16 @@ namespace TurboCommand.Package
             windowFrame.CloseFrame((uint)__FRAMECLOSE.FRAMECLOSE_NoSave);
         }
 
-        public void initDte(DTE2 dte2)
+       
+
+        public void InitActorSystem(ActorSystem commandSystem, DTE2 dte2)
         {
-            this.dte = dte2;
-            var allCommands = this.dte.Commands.Cast<Command>().ToList();
-            var availableCommands = allCommands.Where(r => !string.IsNullOrEmpty(r.Name)).ToList();
-            (base.Content as CommandSearchControl).InitCommands(availableCommands);
+            dte = dte2;
+            CommandSystem = commandSystem;
+            var commandSearcherActor = CommandSystem.ActorOf<CommandSearcher>();
+            SearchControl.InitActorSystem(commandSearcherActor);
+            
+            commandSearcherActor.Tell(new CommandSearchMessage(dte2, SearchControl));
         }
     }
 }

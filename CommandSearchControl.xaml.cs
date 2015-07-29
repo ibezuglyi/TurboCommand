@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using Akka.Actor;
 using EnvDTE;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,18 @@ namespace TurboCommand.Package
     public partial class CommandSearchControl : UserControl
     {
         public List<Command> AvailableCommands { get; set; }
-        public List<CommandListBoxItem> AllCommandsListBoxItems { get; set; }
+        public volatile List<CommandListBoxItem> AllCommandsListBoxItems;
         public event EventHandler ReadyToBeClosed;
         public event CommandEventHandler OnRaiseCommand;
+        public IActorRef CommandSearcherActor { get; set; }
 
         public CommandSearchControl()
         {
             InitializeComponent();
             commandSearch.KeyDown += SearchEnterPressed;
             commandSearch.PreviewKeyUp += ArrowKeysPressed;
+            AllCommandsListBoxItems = new List<CommandListBoxItem>();
+            AvailableCommands = new List<Command>();
         }
 
         private void ArrowKeysPressed(object sender, KeyEventArgs e)
@@ -48,10 +52,16 @@ namespace TurboCommand.Package
                 .OrderByDescending(r => r.IsEnabled)
                 .ThenBy(r => r.CommandName)
                 .ToList();
-            BindCommandsToControl(AllCommandsListBoxItems);
+            FilterAndBind();
         }
 
-        private void BindCommandsToControl(List<CommandListBoxItem> availableCommands)
+        private void FilterAndBind()
+        {
+            var matchedCommands = FindCommandsByText(commandSearch.Text, AllCommandsListBoxItems);
+            BindCommandsToControl(matchedCommands);
+        }
+
+        public void BindCommandsToControl(List<CommandListBoxItem> availableCommands)
         {
             ClearCommandList();
 
@@ -84,14 +94,17 @@ namespace TurboCommand.Package
             }
             else
             {
-                var matchedCommands = FindCommandsByText(commandSearch.Text);
-                BindCommandsToControl(matchedCommands);
+                CommandSearcherActor.Tell(new KeyPressCommandSearchMessage(this, commandSearch.Text));
+                //FilterAndBind();
+                
             }
         }
 
-        private List<CommandListBoxItem> FindCommandsByText(string commandtoken)
+        public static List<CommandListBoxItem> FindCommandsByText(string commandtoken, List<CommandListBoxItem> allCommandsListBoxItems)
         {
-            var matchedCommands = AllCommandsListBoxItems.Where(r => Regex.Match(r.CommandName, Pattern(commandtoken), RegexOptions.IgnoreCase | RegexOptions.Compiled).Success)
+            var newCommandList = new List<CommandListBoxItem>(allCommandsListBoxItems);
+            var matchedCommands = newCommandList
+                   .Where(r => Regex.Match(r.CommandName, Pattern(commandtoken), RegexOptions.IgnoreCase | RegexOptions.Compiled).Success)
                    .OrderByDescending(r => r.IsEnabled)
                    .ThenBy(r => r.CommandName)
                    .ToList();
@@ -151,5 +164,13 @@ namespace TurboCommand.Package
             if (ReadyToBeClosed != null)
                 ReadyToBeClosed(this, null);
         }
+
+
+        public void InitActorSystem(IActorRef commandSearcherActor)
+        {
+            CommandSearcherActor = commandSearcherActor;
+        }
+
+        
     }
 }

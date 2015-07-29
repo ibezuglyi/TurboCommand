@@ -55,6 +55,9 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <RunCodeAnalysis>true</RunCodeAnalysis>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Akka">
+      <HintPath>packages\Akka.1.0.2\lib\net45\Akka.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
@@ -70,6 +73,10 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.11.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.12.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -142,6 +149,8 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="CommandEventHandler.cs" />
     <Compile Include="CommandListboxItem.cs" />
+    <Compile Include="CommandSearcher.cs" />
+    <Compile Include="CommandSearchMessage.cs" />
     <Compile Include="DteInitializer.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="CommandSearchControl.xaml.cs">
@@ -167,6 +176,7 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
